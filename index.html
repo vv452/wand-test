@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>魔杖选择巫师：你的专属魔杖鉴定</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui, -apple-system, sans-serif}
+body{background:#1a1714;color:#f0e8dd;min-height:100vh;padding:20px;}
+.container{max-width:600px;margin:0 auto;}
+.page{display:none;animation:fade 0.4s ease;}
+.page.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.cover{text-align:center;padding:40px 20px;}
+.cover h1{font-size:24px;margin-bottom:16px;color:#d4b886}
+.cover p{line-height:1.7;margin-bottom:30px;color:#c9bca8}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;margin:10px 0;background:#4b3c30;color:#f0e8dd;cursor:pointer}
+.btn:hover{background:#634f3f}
+.question{padding:20px 0;}
+.q-title{font-size:18px;margin-bottom:24px;line-height:1.6}
+.result-card{padding:30px 24px;border-radius:16px;text-align:center;line-height:1.7}
+.tag{font-size:20px;font-weight:bold;margin-bottom:8px}
+.wand-name{font-size:17px;margin-bottom:16px;color:#d4b886}
+.desc{margin:16px 0;font-size:15px;text-align:left}
+.olivander{margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.2);font-style:italic;color:#e2d3bc}
+.share-tip{margin-top:24px;font-size:14px;color:#b8a896}
+.lock-tip{text-align:center;padding:60px 20px;color:#b8a896}
+/* 四个结果配色 */
+.res1{background:linear-gradient(145deg,#361919,#221414)}
+.res2{background:linear-gradient(145deg,#20302b,#16221f)}
+.res3{background:linear-gradient(145deg,#2b1f33,#1c1522)}
+.res4{background:linear-gradient(145deg,#2c2622,#1b1815)}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- 封面页 -->
+  <div id="page0" class="page active">
+    <div class="cover">
+      <h1>🪄 魔杖选择巫师：你的专属魔杖鉴定</h1>
+      <p>🪶 羽毛 ✦ 🪄 魔杖 ✦ ✨ 星芒 ✦ 🌙 月亮 ✦ 🧪 药瓶 ✦ 🗝️ 钥匙<br>奥利凡德魔杖店郑重承诺：每一根魔杖都有它的脾气。<br>请伸出你的魔杖手，寻找与你灵魂共振的那一根。
+      <br><br>📜 测试说明：一共8道情境选择题，大约1分钟完成。
+      <br>本测试基于 Pottermore 官方魔杖学设定，木材+杖芯双维度匹配。</p>
+      <button class="btn" onclick="startTest()">开启鉴定</button>
+    </div>
+  </div>
+
+  <!-- 题目页 -->
+  <div id="page1" class="page">
+    <div class="question">
+      <div class="q-title">1. 如果你的魔杖在战斗中不慎折断，你的第一反应是？</div>
+      <button class="btn" onclick="select('A')">A. 立刻用修复咒尝试修复它，绝不放弃（坚韧）</button>
+      <button class="btn" onclick="select('B')">B. 悲痛但冷静地寻找替代品，总结经验（理智）</button>
+      <button class="btn" onclick="select('C')">C. 寻找最好的工匠，哪怕倾家荡产也要重铸（执着）</button>
+      <button class="btn" onclick="select('D')">D. 顺应天命，把这当成一次重新选择的机会（随性）</button>
+    </div>
+  </div>
+  <div id="page2" class="page">
+    <div class="question">
+      <div class="q-title">2. 在魔药课上，你更倾向于？</div>
+      <button class="btn" onclick="select('A')">A. 严格遵循书本的每一步，精确到克（严谨）</button>
+      <button class="btn" onclick="select('B')">B. 凭直觉加入一些额外材料，看看会发生什么（创造）</button>
+      <button class="btn" onclick="select('C')">C. 和搭档分工合作，你负责掌控火候（协作）</button>
+      <button class="btn" onclick="select('D')">D. 偷偷观察别人熬得怎么样，避免自己出错（谨慎）</button>
+    </div>
+  </div>
+  <div id="page3" class="page">
+    <div class="question">
+      <div class="q-title">3. 当你的好朋友被冤枉时，你通常会？</div>
+      <button class="btn" onclick="select('A')">A. 拍案而起，直接找当事人对峙（直接/勇敢）</button>
+      <button class="btn" onclick="select('B')">B. 搜集证据，用逻辑和事实为朋友洗清冤屈（理性）</button>
+      <button class="btn" onclick="select('C')">C. 默默陪伴朋友，安抚TA的情绪（温柔）</button>
+      <button class="btn" onclick="select('D')">D. 策划一个完美的局，让真凶自投罗网（腹黑/机智）</button>
+    </div>
+  </div>
+  <div id="page4" class="page">
+    <div class="question">
+      <div class="q-title">4. 你最喜欢在霍格沃茨的哪个环境下练习魔法？</div>
+      <button class="btn" onclick="select('A')">A. 阳光明媚的黑湖畔，吹着微风（自然/灵动）</button>
+      <button class="btn" onclick="select('B')">B. 安静得只剩翻书声的图书馆角落（专注/静谧）</button>
+      <button class="btn" onclick="select('C')">C. 充满挑战的决斗俱乐部（竞争/热烈）</button>
+      <button class="btn" onclick="select('D')">D. 夜深人静的公共休息室壁炉旁（温暖/私密）</button>
+    </div>
+  </div>
+  <div id="page5" class="page">
+    <div class="question">
+      <div class="q-title">5. 面对一项极具风险但回报巨大的魔法研究，你会？</div>
+      <button class="btn" onclick="select('A')">A. 评估风险后，果断加入（野心与胆识）</button>
+      <button class="btn" onclick="select('B')">B. 如果能造福很多人，我愿意冒险（无私）</button>
+      <button class="btn" onclick="select('C')">C. 只要能解开未知的谜团，风险算什么（求知）</button>
+      <button class="btn" onclick="select('D')">D. 躲得远远的，安全第一（务实）</button>
+    </div>
+  </div>
+  <div id="page6" class="page">
+    <div class="question">
+      <div class="q-title">6. 你最讨厌哪种性格的人？</div>
+      <button class="btn" onclick="select('A')">A. 懦弱、背叛朋友的人（重情义）</button>
+      <button class="btn" onclick="select('B')">B. 愚蠢、不讲逻辑的人（重理智）</button>
+      <button class="btn" onclick="select('C')">C. 傲慢、不讲理的人（重公平）</button>
+      <button class="btn" onclick="select('D')">D. 虚伪、两面三刀的人（重真诚）</button>
+    </div>
+  </div>
+  <div id="page7" class="page">
+    <div class="question">
+      <div class="q-title">7. 如果可以选择，你希望你的魔杖发光时是什么颜色？</div>
+      <button class="btn" onclick="select('A')">A. 耀眼的金色（光芒）</button>
+      <button class="btn" onclick="select('B')">B. 治愈的蓝绿色（平静）</button>
+      <button class="btn" onclick="select('C')">C. 神秘的银紫色（深邃）</button>
+      <button class="btn" onclick="select('D')">D. 热烈的火红色（激情）</button>
+    </div>
+  </div>
+  <div id="page8" class="page">
+    <div class="question">
+      <div class="q-title">8. 在毕业前的最后一场战役中，你的魔杖会指向哪里？</div>
+      <button class="btn" onclick="select('A')">A. 直面最强大的敌人，为队友争取时间（前锋）</button>
+      <button class="btn" onclick="select('B')">B. 保护受伤的同伴，用防御咒语撑起护盾（后盾）</button>
+      <button class="btn" onclick="select('C')">C. 寻找敌人的弱点，给出关键一击（刺客）</button>
+      <button class="btn" onclick="select('D')">D. 随时游走支援，哪里危险去哪里（全能）</button>
+    </div>
+  </div>
+
+  <!-- 结果页 -->
+  <div id="resultPage" class="page">
+    <div id="resultBox" class="result-card">
+    </div>
+  </div>
+</div>
+
+<script>
+// 【Pottermore官方设定版本】
+const resultMap = {
+  A:{
+    cls:"res1",
+    tag:"【破晓之光】",
+    wand:"冬青木 · 凤凰尾羽",
+    desc:"冬青木偏好拥有非凡勇气、坚守正义的巫师，常和对抗黑暗的战斗魔法契合；凤凰尾羽是最稀少的杖芯，能施展范围最广的魔法，拥有独立意志，有时会依照自身意愿行动，和主人需要长久磨合。<br><br>你的巫师画像：你内心坚韧，在绝境中能迸发出惊人力量，不主动挑起纷争，但绝不畏惧对抗邪恶。你有自己不可动摇的底线，适合守护与决斗类魔法。",
+    olivander:"冬青木配凤凰尾羽，是一根注定走过黑暗、见证重生的魔杖。"
+  },
+  B:{
+    cls:"res2",
+    tag:"【静水流深】",
+    wand:"柳木 · 独角兽毛",
+    desc:"柳木偏爱深藏潜力、内心敏感共情力强的巫师，擅长无声咒与疗愈魔法；独角兽毛施出的魔法最为稳定，最难转向黑魔法，对主人忠诚，和温柔、心怀善意的巫师高度契合。<br><br>你的巫师画像：你是身边人的避风港，擅长感知他人情绪，愿意安抚、守护同伴。但柳木柔韧易折，你常常优先照顾别人，记得留给自己温柔。",
+    olivander:"柳木魔杖总能选中拥有巨大潜能的巫师，独角兽毛带来安稳纯粹的魔法。"
+  },
+  C:{
+    cls:"res3",
+    tag:"【深渊旅人】",
+    wand:"葡萄藤木 · 龙的心弦",
+    desc:"葡萄藤木只选择拥有崇高追求、心怀远大目标的巫师；龙的心弦力量最强，咒语华丽耀眼，学习速度快，但性格急躁，容易失控出意外，也是最容易被黑魔法诱惑的杖芯。<br><br>你的巫师画像：你聪慧敏锐，目标感极强，一旦认定方向就会全力奔赴，不喜欢被束缚，是擅长突破僵局的破局者。",
+    olivander:"葡萄藤木追寻远大理想，龙心弦蕴藏澎湃力量，驾驭它需要强大自制力。"
+  },
+  D:{
+    cls:"res4",
+    tag:"【真理探寻者】",
+    wand:"黑胡桃木 · 雷鸟尾羽",
+    desc:"黑胡桃木拥有敏锐直觉，一旦主人自欺欺人、违背本心，魔杖便会失去魔力；雷鸟尾羽是北美魔杖师的珍稀杖芯，擅长变形术，能提前感知危险，甚至自主释放保护魔法，极难驾驭。<br><br>你的巫师画像：你崇尚真实与逻辑，厌恶虚伪和谎言，好奇心旺盛，执着探寻真相，自带敏锐的危险直觉。",
+    olivander:"黑胡桃木不容谎言，雷鸟尾羽能预知风暴，这是一根忠于本心的魔杖。"
+  }
+};
+
+let current = 0;
+let score = {A:0,B:0,C:0,D:0};
+const totalQ = 8;
+
+// 读取url参数
+function getUrlParam(name){
+  const params = new URLSearchParams(location.search);
+  return params.get(name);
+}
+
+function init(){
+  const urlRes = getUrlParam("r");
+  const localRes = localStorage.getItem("wand_result");
+  if(urlRes){
+    renderResult(urlRes);
+    return;
+  }
+  if(localRes){
+    renderResult(localRes);
+    return;
+  }
+  showPage("page0");
+}
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function startTest(){
+  // 已经测过直接拦截，不能开始测试
+  if(localStorage.getItem("wand_result")){
+    renderResult(localStorage.getItem("wand_result"));
+    return;
+  }
+  current = 1;
+  score={A:0,B:0,C:0,D:0};
+  showPage("page"+current);
+}
+
+function select(opt){
+  score[opt]++;
+  current++;
+  if(current > totalQ){
+    calcResult(opt);
+    return;
+  }
+  showPage("page"+current);
+}
+
+function calcResult(){
+  const order = ["A","B","C","D"];
+  let maxKey = "A";
+  let maxVal = score.A;
+  for(let k of order){
+    if(score[k]>maxVal){
+      maxVal = score[k];
+      maxKey = k;
+    }
+  }
+  // 保存到本地
+  localStorage.setItem("wand_result",maxKey);
+  // 修改url，带上结果参数
+  history.replaceState(null, "", "?r="+maxKey);
+  renderResult(maxKey);
+}
+
+function renderResult(key){
+  const r = resultMap[key];
+  const box = document.getElementById("resultBox");
+  box.className = "result-card "+r.cls;
+  box.innerHTML = `
+    <div class="tag">${r.tag}</div>
+    <div class="wand-name">🪵 ${r.wand}</div>
+    <div class="desc">${r.desc}</div>
+    <div class="olivander">奥利凡德寄语：“${r.olivander}”</div>
+    <div class="share-tip">魔杖选择巫师。分享给朋友，看看谁是你的宿命搭档，谁又是你的克星？</div>
+    <button class="btn" onclick="copyResult('${key}')">复制我的魔杖结果</button>
+  `;
+  showPage("resultPage");
+}
+
+function copyResult(key){
+  const r = resultMap[key];
+  const link = window.location.href;
+  const text = `🪄我的魔杖鉴定结果：${r.tag}\n${r.wand}\n${r.desc}\n奥利凡德寄语：${r.olivander}\n测试链接：${link}`;
+  navigator.clipboard.writeText(text).then(()=>alert("✅结果已复制！"));
+}
+
+init();
+</script>
+</body>
+</html>
