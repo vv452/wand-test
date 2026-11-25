@@ -4,248 +4,566 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>魔杖选择巫师：你的专属魔杖鉴定</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d4b886' d='M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z'/%3E%3C/svg%3E">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui, -apple-system, sans-serif}
-body{background:#1a1714;color:#f0e8dd;min-height:100vh;padding:20px;}
-.container{max-width:600px;margin:0 auto;}
-.page{display:none;animation:fade 0.4s ease;}
-.page.active{display:block;}
-@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.cover{text-align:center;padding:40px 20px;}
-.cover h1{font-size:24px;margin-bottom:16px;color:#d4b886}
-.cover p{line-height:1.7;margin-bottom:30px;color:#c9bca8}
-.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;margin:10px 0;background:#4b3c30;color:#f0e8dd;cursor:pointer}
-.btn:hover{background:#634f3f}
-.question{padding:20px 0;}
-.q-title{font-size:18px;margin-bottom:24px;line-height:1.6}
-.result-card{padding:30px 24px;border-radius:16px;text-align:center;line-height:1.7}
-.tag{font-size:20px;font-weight:bold;margin-bottom:8px}
-.wand-name{font-size:17px;margin-bottom:16px;color:#d4b886}
-.desc{margin:16px 0;font-size:15px;text-align:left}
-.olivander{margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.2);font-style:italic;color:#e2d3bc}
-.share-tip{margin-top:24px;font-size:14px;color:#b8a896}
-.lock-tip{text-align:center;padding:60px 20px;color:#b8a896}
-/* 四个结果配色 */
-.res1{background:linear-gradient(145deg,#361919,#221414)}
-.res2{background:linear-gradient(145deg,#20302b,#16221f)}
-.res3{background:linear-gradient(145deg,#2b1f33,#1c1522)}
-.res4{background:linear-gradient(145deg,#2c2622,#1b1815)}
+:root{
+  --bg:#17130f;
+  --panel:#221b15;
+  --panel-2:#2a2119;
+  --gold:#d4b886;
+  --gold-bright:#ecd9a8;
+  --text:#f0e8dd;
+  --muted:#b3a28c;
+  --line:rgba(212,184,134,.22);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding:20px 16px 40px;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6;
+}
+/* 背景星尘 */
+.stardust{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.stardust span{
+  position:absolute;width:3px;height:3px;border-radius:50%;
+  background:var(--gold);opacity:.35;animation:twinkle 3.4s ease-in-out infinite;
+}
+.stardust span:nth-child(1){top:12%;left:8%}
+.stardust span:nth-child(2){top:22%;right:12%;animation-delay:.6s}
+.stardust span:nth-child(3){top:48%;left:5%;animation-delay:1.2s}
+.stardust span:nth-child(4){top:64%;right:7%;animation-delay:.3s}
+.stardust span:nth-child(5){top:82%;left:14%;animation-delay:1.8s}
+.stardust span:nth-child(6){top:36%;left:48%;animation-delay:2.2s}
+.stardust span:nth-child(7){top:76%;right:30%;animation-delay:.9s}
+.stardust span:nth-child(8){top:6%;left:60%;animation-delay:1.5s}
+@keyframes twinkle{0%,100%{opacity:.12;transform:scale(.8)}50%{opacity:.55;transform:scale(1.25)}}
+
+.container{max-width:560px;margin:0 auto;position:relative;z-index:1}
+.page{display:none;animation:fade .4s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ============ 封面 ============ */
+.cover{text-align:center;padding:24px 0 8px}
+.cover-icons{
+  display:flex;justify-content:center;gap:22px;margin-bottom:22px;
+  color:var(--gold);opacity:.9;
+}
+.cover-icons svg{width:26px;height:26px}
+.shop-badge{
+  display:inline-block;font-size:12px;letter-spacing:.18em;color:var(--muted);
+  border:1px solid var(--line);border-radius:999px;padding:6px 14px;margin-bottom:20px;
+}
+.cover h1{
+  font-family:"Noto Serif SC","Songti SC","STSong",serif;
+  font-size:32px;font-weight:700;letter-spacing:.06em;color:var(--gold-bright);
+  margin-bottom:10px;
+}
+.cover .sub{font-size:16px;color:var(--muted);margin-bottom:24px;letter-spacing:.12em}
+.cover-intro{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 18px;text-align:left;font-size:15px;color:#ddd1c0;
+}
+.cover-intro p+p{margin-top:12px}
+.cover-intro strong{color:var(--gold-bright);font-weight:600}
+.facts{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 26px;
+}
+.fact{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+  padding:14px 8px;text-align:center;
+}
+.fact svg{width:22px;height:22px;color:var(--gold);margin-bottom:6px}
+.fact .f-title{font-size:14px;font-weight:600;color:var(--gold-bright)}
+.fact .f-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.btn{
+  width:100%;padding:15px;border:none;border-radius:14px;font-size:16px;
+  background:linear-gradient(135deg,#8a6a3f,#6b4f2c);color:#fff7ea;cursor:pointer;
+  letter-spacing:.08em;font-family:inherit;transition:transform .15s ease,filter .15s ease;
+}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:scale(.98)}
+.cover-note{margin-top:18px;font-size:12px;color:var(--muted)}
+
+/* ============ 题目页 ============ */
+.quiz-head{margin-bottom:22px}
+.progress-label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:8px}
+.progress-bar{height:6px;background:var(--panel-2);border-radius:999px;overflow:hidden}
+.progress-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-bright));border-radius:999px;transition:width .3s ease}
+.q-title{font-size:19px;line-height:1.7;margin-bottom:22px;font-family:"Noto Serif SC","Songti SC",serif}
+.options{display:grid;gap:12px}
+.opt{
+  display:flex;align-items:flex-start;gap:12px;width:100%;padding:15px;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  color:var(--text);font-size:15px;cursor:pointer;text-align:left;font-family:inherit;
+  transition:border-color .15s ease,background .15s ease;
+}
+.opt:hover{border-color:var(--gold);background:var(--panel-2)}
+.opt .letter{
+  flex:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--gold);
+  color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:1px;
+}
+.opt .opt-text{flex:1;min-width:0}
+.opt .tag-hint{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+
+/* ============ 结果页 ============ */
+.result-card{
+  border-radius:20px;padding:28px 22px;text-align:center;
+  border:1px solid var(--line);
+}
+.res1{background:linear-gradient(160deg,#3a1c1a,#221210)}
+.res2{background:linear-gradient(160deg,#1e2e28,#131f1b)}
+.res3{background:linear-gradient(160deg,#2b1f33,#1a1320)}
+.res4{background:linear-gradient(160deg,#2c2622,#1a1613)}
+.result-eyebrow{font-size:12px;letter-spacing:.2em;color:var(--muted);margin-bottom:10px}
+.result-tag{
+  font-family:"Noto Serif SC","Songti SC",serif;font-size:24px;font-weight:700;
+  color:var(--gold-bright);margin-bottom:6px;
+}
+.result-wand{font-size:17px;color:var(--gold);margin-bottom:16px}
+.spec-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;
+}
+.spec{
+  background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:10px 6px;
+}
+.spec .s-label{font-size:11px;color:var(--muted)}
+.spec .s-value{font-size:13px;margin-top:3px;color:var(--text)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.chip{
+  font-size:12px;color:var(--gold-bright);border:1px solid var(--line);
+  border-radius:999px;padding:5px 12px;background:rgba(255,255,255,.05);
+}
+.block{text-align:left;margin-top:18px}
+.block h3{
+  font-size:13px;color:var(--gold);letter-spacing:.1em;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.block h3 svg{width:16px;height:16px;flex:none}
+.block p{font-size:14.5px;color:#e3d8c8}
+.strengths{display:grid;gap:10px;margin-top:10px}
+.strength{
+  display:flex;align-items:center;gap:10px;font-size:14px;color:#e3d8c8;
+  background:rgba(255,255,255,.04);border-radius:12px;padding:11px 12px;
+}
+.strength svg{width:18px;height:18px;color:var(--gold);flex:none}
+.olivander{
+  margin-top:22px;padding:16px 16px;border-left:2px solid var(--gold);
+  background:rgba(255,255,255,.05);border-radius:0 12px 12px 0;
+  font-style:italic;color:var(--gold-bright);font-size:15px;text-align:left;
+}
+.share-tip{margin-top:22px;font-size:13px;color:var(--muted)}
+.result-actions{margin-top:18px;display:grid;gap:10px}
+.toast{
+  position:fixed;left:50%;bottom:36px;transform:translateX(-50%);
+  background:var(--panel-2);border:1px solid var(--gold);color:var(--gold-bright);
+  padding:10px 18px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;
+  transition:opacity .25s ease;z-index:10;
+}
+.toast.show{opacity:1}
+
+@media (min-width:768px){
+  .cover h1{font-size:38px}
+}
 </style>
 </head>
 <body>
-<div class="container">
-  <!-- 封面页 -->
-  <div id="page0" class="page active">
-    <div class="cover">
-      <h1>🪄 魔杖选择巫师：你的专属魔杖鉴定</h1>
-      <p>🪶 羽毛 ✦ 🪄 魔杖 ✦ ✨ 星芒 ✦ 🌙 月亮 ✦ 🧪 药瓶 ✦ 🗝️ 钥匙<br>奥利凡德魔杖店郑重承诺：每一根魔杖都有它的脾气。<br>请伸出你的魔杖手，寻找与你灵魂共振的那一根。
-      <br><br>📜 测试说明：一共8道情境选择题，大约1分钟完成。
-      <br>本测试基于 Pottermore 官方魔杖学设定，木材+杖芯双维度匹配。</p>
-      <button class="btn" onclick="startTest()">开启鉴定</button>
-    </div>
-  </div>
-
-  <!-- 题目页 -->
-  <div id="page1" class="page">
-    <div class="question">
-      <div class="q-title">1. 如果你的魔杖在战斗中不慎折断，你的第一反应是？</div>
-      <button class="btn" onclick="select('A')">A. 立刻用修复咒尝试修复它，绝不放弃（坚韧）</button>
-      <button class="btn" onclick="select('B')">B. 悲痛但冷静地寻找替代品，总结经验（理智）</button>
-      <button class="btn" onclick="select('C')">C. 寻找最好的工匠，哪怕倾家荡产也要重铸（执着）</button>
-      <button class="btn" onclick="select('D')">D. 顺应天命，把这当成一次重新选择的机会（随性）</button>
-    </div>
-  </div>
-  <div id="page2" class="page">
-    <div class="question">
-      <div class="q-title">2. 在魔药课上，你更倾向于？</div>
-      <button class="btn" onclick="select('A')">A. 严格遵循书本的每一步，精确到克（严谨）</button>
-      <button class="btn" onclick="select('B')">B. 凭直觉加入一些额外材料，看看会发生什么（创造）</button>
-      <button class="btn" onclick="select('C')">C. 和搭档分工合作，你负责掌控火候（协作）</button>
-      <button class="btn" onclick="select('D')">D. 偷偷观察别人熬得怎么样，避免自己出错（谨慎）</button>
-    </div>
-  </div>
-  <div id="page3" class="page">
-    <div class="question">
-      <div class="q-title">3. 当你的好朋友被冤枉时，你通常会？</div>
-      <button class="btn" onclick="select('A')">A. 拍案而起，直接找当事人对峙（直接/勇敢）</button>
-      <button class="btn" onclick="select('B')">B. 搜集证据，用逻辑和事实为朋友洗清冤屈（理性）</button>
-      <button class="btn" onclick="select('C')">C. 默默陪伴朋友，安抚TA的情绪（温柔）</button>
-      <button class="btn" onclick="select('D')">D. 策划一个完美的局，让真凶自投罗网（腹黑/机智）</button>
-    </div>
-  </div>
-  <div id="page4" class="page">
-    <div class="question">
-      <div class="q-title">4. 你最喜欢在霍格沃茨的哪个环境下练习魔法？</div>
-      <button class="btn" onclick="select('A')">A. 阳光明媚的黑湖畔，吹着微风（自然/灵动）</button>
-      <button class="btn" onclick="select('B')">B. 安静得只剩翻书声的图书馆角落（专注/静谧）</button>
-      <button class="btn" onclick="select('C')">C. 充满挑战的决斗俱乐部（竞争/热烈）</button>
-      <button class="btn" onclick="select('D')">D. 夜深人静的公共休息室壁炉旁（温暖/私密）</button>
-    </div>
-  </div>
-  <div id="page5" class="page">
-    <div class="question">
-      <div class="q-title">5. 面对一项极具风险但回报巨大的魔法研究，你会？</div>
-      <button class="btn" onclick="select('A')">A. 评估风险后，果断加入（野心与胆识）</button>
-      <button class="btn" onclick="select('B')">B. 如果能造福很多人，我愿意冒险（无私）</button>
-      <button class="btn" onclick="select('C')">C. 只要能解开未知的谜团，风险算什么（求知）</button>
-      <button class="btn" onclick="select('D')">D. 躲得远远的，安全第一（务实）</button>
-    </div>
-  </div>
-  <div id="page6" class="page">
-    <div class="question">
-      <div class="q-title">6. 你最讨厌哪种性格的人？</div>
-      <button class="btn" onclick="select('A')">A. 懦弱、背叛朋友的人（重情义）</button>
-      <button class="btn" onclick="select('B')">B. 愚蠢、不讲逻辑的人（重理智）</button>
-      <button class="btn" onclick="select('C')">C. 傲慢、不讲理的人（重公平）</button>
-      <button class="btn" onclick="select('D')">D. 虚伪、两面三刀的人（重真诚）</button>
-    </div>
-  </div>
-  <div id="page7" class="page">
-    <div class="question">
-      <div class="q-title">7. 如果可以选择，你希望你的魔杖发光时是什么颜色？</div>
-      <button class="btn" onclick="select('A')">A. 耀眼的金色（光芒）</button>
-      <button class="btn" onclick="select('B')">B. 治愈的蓝绿色（平静）</button>
-      <button class="btn" onclick="select('C')">C. 神秘的银紫色（深邃）</button>
-      <button class="btn" onclick="select('D')">D. 热烈的火红色（激情）</button>
-    </div>
-  </div>
-  <div id="page8" class="page">
-    <div class="question">
-      <div class="q-title">8. 在毕业前的最后一场战役中，你的魔杖会指向哪里？</div>
-      <button class="btn" onclick="select('A')">A. 直面最强大的敌人，为队友争取时间（前锋）</button>
-      <button class="btn" onclick="select('B')">B. 保护受伤的同伴，用防御咒语撑起护盾（后盾）</button>
-      <button class="btn" onclick="select('C')">C. 寻找敌人的弱点，给出关键一击（刺客）</button>
-      <button class="btn" onclick="select('D')">D. 随时游走支援，哪里危险去哪里（全能）</button>
-    </div>
-  </div>
-
-  <!-- 结果页 -->
-  <div id="resultPage" class="page">
-    <div id="resultBox" class="result-card">
-    </div>
-  </div>
+<div class="stardust" aria-hidden="true">
+  <span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span>
 </div>
 
+<div class="container">
+
+  <!-- ===== 封面页 ===== -->
+  <div id="page0" class="page active">
+    <div class="cover">
+      <div class="cover-icons" aria-hidden="true">
+        <!-- 羽毛 -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+          <line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>
+        </svg>
+        <!-- 魔杖 -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 4.5 4.5 14.5l3 3L17.5 7.5z"/>
+          <path d="M16 3l.8 1.8L18.5 5.5l-1.7.7L16 8l-.8-1.8L13.5 5.5l1.7-.7z" fill="currentColor" stroke="none"/>
+        </svg>
+        <!-- 星芒 -->
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3l1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7z"/>
+        </svg>
+        <!-- 月亮 -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>
+        </svg>
+        <!-- 药瓶 -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 3h6M10 3v5.3L4.8 17a2 2 0 0 0 1.8 3h10.8a2 2 0 0 0 1.8-3L14 8.3V3"/>
+          <line x1="7.5" y1="13" x2="16.5" y2="13"/>
+        </svg>
+        <!-- 钥匙 -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="15" r="4"/>
+          <path d="M11.5 11.5 20 3M16 7l3 3M13 10l2 2"/>
+        </svg>
+      </div>
+
+      <div class="shop-badge">奥利凡德魔杖店 · 自公元前 382 年</div>
+      <h1>魔杖选择巫师</h1>
+      <div class="sub">你的专属魔杖鉴定</div>
+
+      <div class="cover-intro">
+        <p>在魔法世界里，<strong>不是你挑选魔杖，而是魔杖选定主人</strong>。每一根魔杖都由特定的木材与杖芯构成，带着各自的脾气、偏好与力量，只与灵魂共振的巫师同行。</p>
+        <p>这 8 道情境题，会从你的<strong>行事风格</strong>推导出属于你的魔杖木材，从你的<strong>内心驱动力</strong>推导出杖芯，两相交织，得出你的本命魔杖。木材与杖芯的设定参考 J.K.罗琳官方魔杖学（Pottermore / Wizarding World）。</p>
+      </div>
+
+      <div class="facts">
+        <div class="fact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          <div class="f-title">8 道情境题</div>
+          <div class="f-desc">快速直击内心</div>
+        </div>
+        <div class="fact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <div class="f-title">约 1 分钟</div>
+          <div class="f-desc">无需提前准备</div>
+        </div>
+        <div class="fact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7z"/></svg>
+          <div class="f-title">双维度匹配</div>
+          <div class="f-desc">木材 × 杖芯</div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="startTest()">伸出魔杖手，开始鉴定</button>
+      <div class="cover-note">测试仅供娱乐 · 每根魔杖一生只会选择一位巫师</div>
+    </div>
+  </div>
+
+  <!-- ===== 题目页 ===== -->
+  <div id="page1" class="page">
+    <div class="quiz-head">
+      <div class="progress-label"><span>魔杖鉴定中</span><span class="p-num">1 / 8</span></div>
+      <div class="progress-bar"><i id="p-bar"></i></div>
+    </div>
+    <div class="q-title">1. 如果你的魔杖在战斗中不慎折断，你的第一反应是？</div>
+    <div class="options">
+      <button class="opt" onclick="select('A')"><span class="letter">A</span><span class="opt-text">立刻用修复咒尝试修复它，绝不放弃<span class="tag-hint">坚韧</span></span></button>
+      <button class="opt" onclick="select('B')"><span class="letter">B</span><span class="opt-text">悲痛但冷静地寻找替代品，总结经验<span class="tag-hint">理智</span></span></button>
+      <button class="opt" onclick="select('C')"><span class="letter">C</span><span class="opt-text">寻找最好的工匠，哪怕倾家荡产也要重铸<span class="tag-hint">执着</span></span></button>
+      <button class="opt" onclick="select('D')"><span class="letter">D</span><span class="opt-text">顺应天命，把这当成一次重新选择的机会<span class="tag-hint">随性</span></span></button>
+    </div>
+  </div>
+
+  <div id="page2" class="page">
+    <div class="quiz-head">
+      <div class="progress-label"><span>魔杖鉴定中</span><span class="p-num">2 / 8</span></div>
+      <div class="progress-bar"><i id="p-bar"></i></div>
+    </div>
+    <div class="q-title">2. 在魔药课上，你更倾向于？</div>
+    <div class="options">
+      <button class="opt" onclick="select('A')"><span class="letter">A</span><span class="opt-text">严格遵循书本的每一步，精确到克<span class="tag-hint">严谨</span></span></button>
+      <button class="opt" onclick="select('B')"><span class="letter">B</span><span class="opt-text">凭直觉加入一些额外材料，看看会发生什么<span class="tag-hint">创造</span></span></button>
+      <button class="opt" onclick="select('C')"><span class="letter">C</span><span class="opt-text">和搭档分工合作，你负责掌控火候<span class="tag-hint">协作</span></span></button>
+      <button class="opt" onclick="select('D')"><span class="letter">D</span><span class="opt-text">偷偷观察别人熬得怎么样，避免自己出错<span class="tag-hint">谨慎</span></span></button>
+    </div>
+  </div>
+
+  <div id="page3" class="page">
+    <div class="quiz-head">
+      <div class="progress-label"><span>魔杖鉴定中</span><span class="p-num">3 / 8</span></div>
+      <div class="progress-bar"><i id="p-bar"></i></div>
+    </div>
+    <div class="q-title">3. 当你的好朋友被冤枉时，你通常会？</div>
+    <div class="options">
+      <button class="opt" onclick="select('A')"><span class="letter">A</span><span class="opt-text">拍案而起，直接找当事人对峙<span class="tag-hint">直接 · 勇敢</span></span></button>
+      <button class="opt" onclick="select('B')"><span class="letter">B</span><span class="opt-text">搜集证据，用逻辑和事实为朋友洗清冤屈<span class="tag-hint">理性</span></span></button>
+      <button class="opt" onclick="select('C')"><span class="letter">C</span><span class="opt-text">默默陪伴朋友，安抚 TA 的情绪<span class="tag-hint">温柔</span></span></button>
+      <button class="opt" onclick="select('D')"><span class="letter">D</span><span class="opt-text">策划一个完美的局，让真凶自投罗网<span class="tag-hint">机智 · 谋略</span></span></button>
+    </div>
+  </div>
+
+  <div id="page4" class="page">
+    <div class="quiz-head">
+      <div class="progress-label"><span>魔杖鉴定中</span><span class="p-num">4 / 8</span></div>
+      <div class="progress-bar"><i id="p-bar"></i></div>
+    </div>
+    <div class="q-title">4. 你最喜欢在霍格沃茨的哪个环境下练习魔法？</div>
+    <div class="options">
+      <button class="opt" onclick="select('A')"><span class="letter">A</span><span class="opt-text">阳光明媚的黑湖畔，吹着微风<span class="tag-hint">自然 · 灵动</span></span></button>
+      <button class="opt" onclick="select('B')"><span class="letter">B</span><span class="opt-text">安静得只剩翻书声的图书馆角落<span class="tag-hint">专注 · 静谧</span></span></button>
+      <button class="opt" onclick="select('C')"><span class="letter">C</span><span class="opt-text">充满挑战的决斗俱乐部<span class="tag-hint">竞争 · 热烈</span></span></button>
+      <button class="opt" onclick="select('D')"><span class="letter">D</span><span class="opt-text">夜深人静的公共休息室壁炉旁<span class="tag-hint">温暖 · 私密</span></span></button>
+    </div>
+  </div>
+
+  <div id="page5" class="page">
+    <div class="quiz-head">
+      <div class="progress-label"><span>魔杖鉴定中</span><span class="p-num">5 / 8</span></div>
+      <div class="progress-bar"><i id="p-bar"></i></div>
+    </div>
+    <div class="q-title">5. 面对一项极具风险但回报巨大的魔法研究，你会？</div>
+    <div class="options">
+      <button class="opt" onclick="select('A')"><span class="letter">A</span><span class="opt-text">评估风险后，果断加入<span class="tag-hint">野心与胆识</span></span></button>
+      <button class="opt" onclick="select('B')"><span class="letter">B</span><span class="opt-text">如果能造福很多人，我愿意冒险<span class="tag-hint">无私</span></span></button>
+      <button class="opt" onclick="select('C')"><span class="letter">C</span><span class="opt-text">只要能解开未知的谜团，风险算什么<span class="tag-hint">求知</span></span></button>
+      <button class="opt" onclick="select('D')"><span class="letter">D</span><span class="opt-text">躲得远远的，安全第一<span class="tag-hint">务实</span></span></button>
+    </div>
+  </div>
+
+  <div id="page6" class="page">
+    <div class="quiz-head">
+      <div class="progress-label"><span>魔杖鉴定中</span><span class="p-num">6 / 8</span></div>
+      <div class="progress-bar"><i id="p-bar"></i></div>
+    </div>
+    <div class="q-title">6. 你最讨厌哪种性格的人？</div>
+    <div class="options">
+      <button class="opt" onclick="select('A')"><span class="letter">A</span><span class="opt-text">懦弱、背叛朋友的人<span class="tag-hint">重情义</span></span></button>
+      <button class="opt" onclick="select('B')"><span class="letter">B</span><span class="opt-text">愚蠢、不讲逻辑的人<span class="tag-hint">重理智</span></span></button>
+      <button class="opt" onclick="select('C')"><span class="letter">C</span><span class="opt-text">傲慢、不讲理的人<span class="tag-hint">重公平</span></span></button>
+      <button class="opt" onclick="select('D')"><span class="letter">D</span><span class="opt-text">虚伪、两面三刀的人<span class="tag-hint">重真诚</span></span></button>
+    </div>
+  </div>
+
+  <div id="page7" class="page">
+    <div class="quiz-head">
+      <div class="progress-label"><span>魔杖鉴定中</span><span class="p-num">7 / 8</span></div>
+      <div class="progress-bar"><i id="p-bar"></i></div>
+    </div>
+    <div class="q-title">7. 如果可以选择，你希望你的魔杖发光时是什么颜色？</div>
+    <div class="options">
+      <button class="opt" onclick="select('A')"><span class="letter">A</span><span class="opt-text">耀眼的金色<span class="tag-hint">光芒</span></span></button>
+      <button class="opt" onclick="select('B')"><span class="letter">B</span><span class="opt-text">治愈的蓝绿色<span class="tag-hint">平静</span></span></button>
+      <button class="opt" onclick="select('C')"><span class="letter">C</span><span class="opt-text">神秘的银紫色<span class="tag-hint">深邃</span></span></button>
+      <button class="opt" onclick="select('D')"><span class="letter">D</span><span class="opt-text">热烈的火红色<span class="tag-hint">激情</span></span></button>
+    </div>
+  </div>
+
+  <div id="page8" class="page">
+    <div class="quiz-head">
+      <div class="progress-label"><span>魔杖鉴定中</span><span class="p-num">8 / 8</span></div>
+      <div class="progress-bar"><i id="p-bar"></i></div>
+    </div>
+    <div class="q-title">8. 在毕业前的最后一场战役中，你的魔杖会指向哪里？</div>
+    <div class="options">
+      <button class="opt" onclick="select('A')"><span class="letter">A</span><span class="opt-text">直面最强大的敌人，为队友争取时间<span class="tag-hint">前锋</span></span></button>
+      <button class="opt" onclick="select('B')"><span class="letter">B</span><span class="opt-text">保护受伤的同伴，用防御咒语撑起护盾<span class="tag-hint">后盾</span></span></button>
+      <button class="opt" onclick="select('C')"><span class="letter">C</span><span class="opt-text">寻找敌人的弱点，给出关键一击<span class="tag-hint">刺客</span></span></button>
+      <button class="opt" onclick="select('D')"><span class="letter">D</span><span class="opt-text">随时游走支援，哪里危险去哪里<span class="tag-hint">全能</span></span></button>
+    </div>
+  </div>
+
+  <!-- ===== 结果页 ===== -->
+  <div id="resultPage" class="page">
+    <div id="resultBox" class="result-card"></div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
 <script>
-// 【Pottermore官方设定版本】
+/* ===== 结果库：设定参考 Wizarding World 官方魔杖学 ===== */
 const resultMap = {
   A:{
     cls:"res1",
     tag:"【破晓之光】",
     wand:"冬青木 · 凤凰尾羽",
-    desc:"冬青木偏好拥有非凡勇气、坚守正义的巫师，常和对抗黑暗的战斗魔法契合；凤凰尾羽是最稀少的杖芯，能施展范围最广的魔法，拥有独立意志，有时会依照自身意愿行动，和主人需要长久磨合。<br><br>你的巫师画像：你内心坚韧，在绝境中能迸发出惊人力量，不主动挑起纷争，但绝不畏惧对抗邪恶。你有自己不可动摇的底线，适合守护与决斗类魔法。",
-    olivander:"冬青木配凤凰尾羽，是一根注定走过黑暗、见证重生的魔杖。"
+    spec:{length:"11 英寸",flex:"略有弹性",ref:"经典同款：哈利·波特"},
+    chips:["坚韧不拔","护佑他人","底线分明","绝境反击"],
+    strengths:["防御与决斗魔法","危机中爆发力量","守护身边同伴"],
+    wood:"冬青木是较稀有的保护性木材，传统上被视为守护之木；它最适合需要克服愤怒与急躁倾向的主人，也常选择投身危险与精神追求的巫师。",
+    core:"凤凰尾羽是最稀有的杖芯，能施展范围最广的魔法；它自主性极强，有时会依自身意愿行动，对潜在主人也最为挑剔。冬青木与凤凰尾羽本是出了名的难搭配，一旦遇上契合的主人，便没有什么能阻挡他们。",
+    portrait:"你是一个极具韧性的人，在绝境中往往能爆发出惊人的力量。你不惹事，但绝对不怕事，心里有不可动摇的底线；一旦被触碰，你的反击会让所有人记住。",
+    olivander:"这是一根属于斗士的魔杖，它会在最黑暗的时刻为你点燃希望。"
   },
   B:{
     cls:"res2",
     tag:"【静水流深】",
     wand:"柳木 · 独角兽毛",
-    desc:"柳木偏爱深藏潜力、内心敏感共情力强的巫师，擅长无声咒与疗愈魔法；独角兽毛施出的魔法最为稳定，最难转向黑魔法，对主人忠诚，和温柔、心怀善意的巫师高度契合。<br><br>你的巫师画像：你是身边人的避风港，擅长感知他人情绪，愿意安抚、守护同伴。但柳木柔韧易折，你常常优先照顾别人，记得留给自己温柔。",
-    olivander:"柳木魔杖总能选中拥有巨大潜能的巫师，独角兽毛带来安稳纯粹的魔法。"
+    spec:{length:"14 英寸",flex:"相当柔韧",ref:"经典同款：罗恩·韦斯莱（第二根）"},
+    chips:["共情力强","温柔可靠","潜力深藏","无声咒天赋"],
+    strengths:["高级治愈魔法","无声咒与安抚咒语","长久陪伴"],
+    wood:"柳木是不常见的治愈之木，理想主人往往藏着某种不易察觉的不安；它从不选择自认学无所长的人，而始终追随潜力最大的巫师。奥利凡德家有句谚语：前路最远的人，用柳木走得最快。",
+    core:"独角兽毛施出的魔法最为稳定，是最难转向黑魔法的杖芯，对主人忠诚而长情。",
+    portrait:"你是朋友眼里的避风港，总能敏锐察觉他人的情绪，愿意先伸手安抚别人。但柳木柔韧易折，你常常治愈别人，也要记得心疼自己。",
+    olivander:"它极不寻常地适合高级治疗魔法，如果你愿意，它能抚平世上最深的创伤。"
   },
   C:{
     cls:"res3",
     tag:"【深渊旅人】",
     wand:"葡萄藤木 · 龙的心弦",
-    desc:"葡萄藤木只选择拥有崇高追求、心怀远大目标的巫师；龙的心弦力量最强，咒语华丽耀眼，学习速度快，但性格急躁，容易失控出意外，也是最容易被黑魔法诱惑的杖芯。<br><br>你的巫师画像：你聪慧敏锐，目标感极强，一旦认定方向就会全力奔赴，不喜欢被束缚，是擅长突破僵局的破局者。",
-    olivander:"葡萄藤木追寻远大理想，龙心弦蕴藏澎湃力量，驾驭它需要强大自制力。"
+    spec:{length:"10¾ 英寸",flex:"柔韧适中",ref:"经典同款：赫敏·格兰杰"},
+    chips:["远见卓识","目标感强","洞察人心","人群破局者"],
+    strengths:["华丽强效的咒语","求知与临场应变","关键时刻反击"],
+    wood:"葡萄藤木属于较稀有的木材，主人几乎都追求更高的目标、拥有超越常人的远见；它对藏有深度的人格有强烈吸引力，是最能即时识别命中主人的木材之一。",
+    core:"龙的心弦力量最强，能施出最华丽、最强大的魔咒，但性子急躁，容易发生小意外，也比其他杖芯更易受黑魔法诱惑。",
+    portrait:"你聪明敏锐，外表随和，内心极有主见。一旦认定目标就会全力奔赴，不喜欢被束缚，渴望掌控自己的人生剧本，是人群里的破局者。",
+    olivander:"龙心弦最强大，也最危险；你的魅力在于，你总能把危险变成奇迹。"
   },
   D:{
     cls:"res4",
     tag:"【真理探寻者】",
     wand:"黑胡桃木 · 雷鸟尾羽",
-    desc:"黑胡桃木拥有敏锐直觉，一旦主人自欺欺人、违背本心，魔杖便会失去魔力；雷鸟尾羽是北美魔杖师的珍稀杖芯，擅长变形术，能提前感知危险，甚至自主释放保护魔法，极难驾驭。<br><br>你的巫师画像：你崇尚真实与逻辑，厌恶虚伪和谎言，好奇心旺盛，执着探寻真相，自带敏锐的危险直觉。",
-    olivander:"黑胡桃木不容谎言，雷鸟尾羽能预知风暴，这是一根忠于本心的魔杖。"
+    spec:{length:"随主人而定",flex:"刚柔并济",ref:"北美伊法摩尼风格"},
+    chips:["直觉敏锐","崇尚真实","逻辑至上","求知欲旺盛"],
+    strengths:["洞察并识破谎言","危险预感","探查未知秘密"],
+    wood:"黑胡桃木比普通胡桃木少见，寻求直觉敏锐、洞察力强的主人；它外形出众却不易驾驭，对内心冲突异常敏感——一旦主人自欺欺人，魔杖便会大幅流失魔力。",
+    core:"雷鸟尾羽是北美风格的珍稀杖芯，对危险有敏锐预感，能在战斗中掀起风与风暴，极难驾驭。",
+    portrait:"你是个绝对的理智派，讨厌愚蠢、虚伪和没有逻辑的东西。你对世界充满好奇，执着探寻真相；偶尔显得高冷，因为真正懂你的人确实不多。",
+    olivander:"这是一根有脾气的魔杖，但只要你们灵魂契合，它能为你召唤风暴。"
   }
 };
 
+const TOTAL_Q = 8;
 let current = 0;
 let score = {A:0,B:0,C:0,D:0};
-const totalQ = 8;
+let currentResultKey = null;
 
-// 读取url参数
-function getUrlParam(name){
+function getUrlResult(){
   const params = new URLSearchParams(location.search);
-  return params.get(name);
+  const r = params.get("r") || location.hash.replace("#","");
+  return resultMap[r] ? r : null;
+}
+
+function saveResult(key){
+  localStorage.setItem("wand_result", key);
+  try{
+    const url = new URL(location.href);
+    url.searchParams.set("r", key);
+    url.hash = "";
+    history.replaceState(null, "", url.toString());
+  }catch(e){}
 }
 
 function init(){
-  const urlRes = getUrlParam("r");
-  const localRes = localStorage.getItem("wand_result");
-  if(urlRes){
-    renderResult(urlRes);
-    return;
+  const saved = getUrlResult() || localStorage.getItem("wand_result");
+  if(saved && resultMap[saved]){
+    renderResult(saved);
+    showPage("resultPage");
   }
-  if(localRes){
-    renderResult(localRes);
-    return;
-  }
-  showPage("page0");
 }
 
 function showPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
 function startTest(){
-  // 已经测过直接拦截，不能开始测试
-  if(localStorage.getItem("wand_result")){
-    renderResult(localStorage.getItem("wand_result"));
+  const saved = localStorage.getItem("wand_result");
+  if(saved && resultMap[saved]){
+    renderResult(saved);
+    showPage("resultPage");
     return;
   }
   current = 1;
-  score={A:0,B:0,C:0,D:0};
-  showPage("page"+current);
+  score = {A:0,B:0,C:0,D:0};
+  showPage("page1");
+  updateProgress();
+}
+
+function updateProgress(){
+  const bar = document.querySelector("#page"+current+" .progress-bar i");
+  const num = document.querySelector("#page"+current+" .p-num");
+  if(bar) bar.style.width = (current/TOTAL_Q*100)+"%";
+  if(num) num.textContent = current+" / "+TOTAL_Q;
 }
 
 function select(opt){
   score[opt]++;
   current++;
-  if(current > totalQ){
-    calcResult(opt);
-    return;
+  if(current > TOTAL_Q){
+    calcResult();
+  }else{
+    showPage("page"+current);
+    updateProgress();
   }
-  showPage("page"+current);
 }
 
 function calcResult(){
   const order = ["A","B","C","D"];
-  let maxKey = "A";
-  let maxVal = score.A;
-  for(let k of order){
-    if(score[k]>maxVal){
-      maxVal = score[k];
-      maxKey = k;
-    }
+  let maxKey = "A", maxVal = score.A;
+  for(const k of order){
+    if(score[k] > maxVal){ maxVal = score[k]; maxKey = k; }
   }
-  // 保存到本地
-  localStorage.setItem("wand_result",maxKey);
-  // 修改url，带上结果参数
-  history.replaceState(null, "", "?r="+maxKey);
+  saveResult(maxKey);
   renderResult(maxKey);
+  showPage("resultPage");
 }
 
 function renderResult(key){
+  currentResultKey = key;
   const r = resultMap[key];
   const box = document.getElementById("resultBox");
   box.className = "result-card "+r.cls;
   box.innerHTML = `
-    <div class="tag">${r.tag}</div>
-    <div class="wand-name">🪵 ${r.wand}</div>
-    <div class="desc">${r.desc}</div>
+    <div class="result-eyebrow">奥利凡德鉴定完成</div>
+    <div class="result-tag">${r.tag}</div>
+    <div class="result-wand">${r.wand}</div>
+    <div class="spec-row">
+      <div class="spec"><div class="s-label">长度</div><div class="s-value">${r.spec.length}</div></div>
+      <div class="spec"><div class="s-label">柔韧性</div><div class="s-value">${r.spec.flex}</div></div>
+      <div class="spec"><div class="s-label">备注</div><div class="s-value">${r.spec.ref}</div></div>
+    </div>
+    <div class="chips">${r.chips.map(c=>`<span class="chip">${c}</span>`).join("")}</div>
+    <div class="block">
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7z"/></svg>魔法特长</h3>
+      <div class="strengths">
+        ${r.strengths.map(s=>`<div class="strength"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>${s}</div>`).join("")}
+      </div>
+    </div>
+    <div class="block">
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5 4.5 14.5l3 3L17.5 7.5z"/></svg>木材解析</h3>
+      <p>${r.wood}</p>
+    </div>
+    <div class="block">
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>杖芯解析</h3>
+      <p>${r.core}</p>
+    </div>
+    <div class="block">
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-5-3-5 3-5-3z"/></svg>你的巫师画像</h3>
+      <p>${r.portrait}</p>
+    </div>
     <div class="olivander">奥利凡德寄语：“${r.olivander}”</div>
-    <div class="share-tip">魔杖选择巫师。分享给朋友，看看谁是你的宿命搭档，谁又是你的克星？</div>
-    <button class="btn" onclick="copyResult('${key}')">复制我的魔杖结果</button>
+    <div class="share-tip">魔杖选择巫师。分享给朋友，看看谁是你的宿命搭档，谁又是你的克星；也欢迎在评论区留下你的「木材 + 杖芯」组合。</div>
+    <div class="result-actions">
+      <button class="btn" onclick="copyResult()">复制我的魔杖结果</button>
+    </div>
   `;
-  showPage("resultPage");
 }
 
-function copyResult(key){
-  const r = resultMap[key];
-  const link = window.location.href;
-  const text = `🪄我的魔杖鉴定结果：${r.tag}\n${r.wand}\n${r.desc}\n奥利凡德寄语：${r.olivander}\n测试链接：${link}`;
-  navigator.clipboard.writeText(text).then(()=>alert("✅结果已复制！"));
+function copyResult(){
+  const r = resultMap[currentResultKey];
+  const text = `我的本命魔杖是${r.tag}${r.wand}，快来测测你的专属魔杖：${location.href}`;
+  const done = ()=>showToast("结果与链接已复制，去分享给朋友吧");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  }else{
+    fallbackCopy(text,done);
+  }
+}
+
+function fallbackCopy(text,done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){ showToast("复制失败，请手动截图分享"); }
+  document.body.removeChild(ta);
+}
+
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"),2200);
 }
 
 init();
